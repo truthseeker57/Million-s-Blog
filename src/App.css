@@ -386,6 +386,10 @@ html::-webkit-scrollbar-corner,
 
 .del:hover{ border-color:#2a2a2a; }
 
+.edit:hover{  border-color:#2a2a2a; 
+  background:#3a48ff;
+  color:#fff ;}
+
 /* ===== DecryptedText states (optional) ===== */
 .revealed{ opacity:1; }
 .encrypted{ opacity:.75; filter:saturate(140%); }
