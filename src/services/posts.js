@@ -18,4 +18,5 @@ const deletePost = (postId) => {
     return req.then(response => response.data)
 }
 
+
 export default { getAll, createPost, deletePost }
