@@ -13,10 +13,15 @@ const createPost = (post) => {
     return req.then(response => response.data)
 }
 
+const editPost = (post, newItem) => {
+    const req = axios.put(`${baseURL}/${post}`, newItem)
+    return req.then(response => response.data)
+}
+
 const deletePost = (postId) => {
     const req = axios.delete(`${baseURL}/${postId}`)
     return req.then(response => response.data)
 }
 
 
-export default { getAll, createPost, deletePost }
+export default { getAll, createPost, editPost, deletePost }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaTrash } from "react-icons/fa";
 import { BiBookOpen } from "react-icons/bi";
-import { AiFillEdit } from "react-icons/ai";
+import { AiFillEdit, AiOutlineClose } from "react-icons/ai"; 
 import './App.css';
 import DecryptedText from './components/DecryptedText';
 import Squares from './components/Squares.jsx';
@@ -9,6 +9,7 @@ import ComposerModal from './components/ComposerModal.jsx';
 import ReadModal from './components/ReadModal.jsx';
 import postServices from './services/posts.js';
 import EditModal from './components/EditModal.jsx';
+import Trash from './components/Trash.jsx'
 
 const ensureTagArray = (tags) => {
   if (Array.isArray(tags)) return tags;
@@ -66,8 +67,7 @@ const PostItem = ({ posts, onDelete, onRead, onEdit }) => (
           <button className="post-action-btn edit" onClick={() => onEdit(post.id)} aria-label="Edit post">
             <AiFillEdit />
           </button>
-
-          <button className="post-action-btn del" onClick={() => onDelete(post.id)} aria-label="Delete post">
+          <button className="post-action-btn del" onClick={() => onDelete(post.id)} aria-label="Move post to Trash">
             <FaTrash />
           </button>
         </div>
@@ -76,6 +76,7 @@ const PostItem = ({ posts, onDelete, onRead, onEdit }) => (
   </div>
 );
 
+
 export default function App() {
   const [posts, setPosts] = useState([]);
   const [query, setQuery] = useState('');
@@ -83,6 +84,24 @@ export default function App() {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isReadModalOpen, setIsReadModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState(null);
+  const [trashedPosts, setTrashedPosts] = useState([]);
+  const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const [showNotif, setShowNotif] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() =>
+      setShowNotif(false), 4000)
+    return () => clearTimeout(timer)
+  }
+    , [showNotif])
+
+      useEffect(() => {
+    if (!showNotif) return;
+    const timer = setTimeout(() => setShowNotif(false), 4000);
+    return () => clearTimeout(timer);
+  }, [showNotif]);
+
+console.log(showNotif)
   const [formData, setFormData] = useState({
     title: '',
     excerpt: '',
@@ -113,22 +132,34 @@ export default function App() {
     setIsReadModalOpen(true);
   };
 
-  const deletePost = (id) => {
-    postServices.deletePost(id).then(() => {
-      setPosts(prev => prev.filter(post => post.id !== id));
-      if (selectedPost?.id === id) {
-        setSelectedPost(null);
-        setIsReadModalOpen(false);
-        setIsEditorOpen(false);
-      }
-    });
+  const moveToTrash = (id) => {
+    const post = posts.find(p => p.id === id);
+    if (!post) return;
+
+    setPosts(prev => prev.filter(p => p.id !== id));
+    setTrashedPosts(prev => [{ ...post }, ...prev]);
+
+    postServices.trashPost?.(id).catch(() => { });
+  };
+
+  const purgePost = (id) => {
+    setTrashedPosts(prev => prev.filter(p => p.id !== id));
+    postServices.deletePost?.(id).catch(() => { });
+  };
+
+  const restorePost = (id) => {
+    const post = trashedPosts.find(p => p.id === id);
+    if (!post) return;
+    setTrashedPosts(prev => prev.filter(p => p.id !== id));
+    setPosts(prev => [post, ...prev]);
+    postServices.restorePost?.(id).catch(() => { });
   };
 
   const editPost = (id) => {
     const post = posts.find(p => p.id === id);
     setSelectedPost(post);
     setIsEditorOpen(true);
-  };
+  }
 
   const handleNewPost = () => {
     setSelectedPost(null);
@@ -147,32 +178,39 @@ export default function App() {
     setIsComposerOpen(false);
     setIsEditorOpen(false);
     setIsReadModalOpen(false);
+    setIsTrashOpen(false); 
     setSelectedPost(null);
   };
 
-  const handleContentUpdate = (e) => {
+  const handleContentUpdate = async (e) => {
     e.preventDefault();
     if (!selectedPost) return;
 
     const id = selectedPost.id;
-    const updates = {
+    const original = posts.find(p => p.id === id) || {}
+
+    const updatedPost = {
+      ...original,
       title: formData.title,
       excerpt: formData.excerpt,
       tags: tagAssembler(formData.tags),
       content: formData.content,
-    };
-
-    setPosts(prev =>
-      prev.map(post => (post.id === id ? { ...post, ...updates } : post))
-    );
-
-    if (postServices.updatePost) {
-      postServices.updatePost(id, updates).catch(() => {});
     }
 
-    setIsEditorOpen(false);
-    setSelectedPost(null);
-  };
+    setPosts(prev => prev.map(p => (p.id === id ? updatedPost : p)));
+
+    try {
+      const resp = await postServices.editPost(id, updatedPost);
+      if (resp?.data) {
+        setPosts(prev => prev.map(p => (p.id === id ? resp.data : p)));
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsEditorOpen(false);
+      setSelectedPost(null);
+    }
+  }
 
   const handleModalSubmit = (e) => {
     e.preventDefault();
@@ -207,6 +245,12 @@ export default function App() {
 
   return (
     <>
+
+      {showNotif && <div className="notification">Post has been saved in Drafts.</div>}
+
+
+
+
       {isComposerOpen && (
         <ComposerModal
           isOpen
@@ -214,6 +258,7 @@ export default function App() {
           formData={formData}
           setFormData={setFormData}
           onSubmit={handleModalSubmit}
+          setShowNotif={setShowNotif}
         />
       )}
 
@@ -233,6 +278,17 @@ export default function App() {
           setFormData={setFormData}
           onSubmit={handleContentUpdate}
           post={selectedPost}
+        />
+      )}
+
+      {/* NEW: Trash modal mount */}
+      {isTrashOpen && (
+        <Trash
+          isOpen={isTrashOpen}
+          onClose={() => setIsTrashOpen(false)}
+          trashedPosts={trashedPosts}
+          onRestore={restorePost}
+          onDelete={purgePost}
         />
       )}
 
@@ -261,13 +317,15 @@ export default function App() {
             <span className="new-icon">+</span> New
           </div>
           <div className="post-action">Drafts</div>
-          <div className="post-action">Trash</div>
+
+          <div className="post-action" onClick={() => setIsTrashOpen(true)}>Trash <span className="trash-count">{trashedPosts.length < 999 ? trashedPosts.length : '999+'}</span></div>
+
           <div className="post-action">Export</div>
         </div>
 
         <PostItem
           posts={posts}
-          onDelete={deletePost}
+          onDelete={moveToTrash}
           onRead={readPost}
           onEdit={editPost}
         />
