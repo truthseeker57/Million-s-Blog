@@ -1,4 +1,4 @@
-const ComposerModal = ({ isOpen, onClose, formData, setFormData, onSubmit, setShowNotif }) => {
+const ComposerModal = ({ isOpen, onClose, formData, setFormData, onSubmit, setShowNotif, addToDrafts }) => {
 
     if (!isOpen) return null;
 
@@ -23,7 +23,7 @@ const ComposerModal = ({ isOpen, onClose, formData, setFormData, onSubmit, setSh
                         <h3 id="composer-title" className="modal__title">NEW_POST.TXT</h3>
                         <div className="modal__actions">
                             <button className="btn btn--primary" type="submit">Publish</button>
-                            <button className="btn btn--danger" type="button" onClick={() => { onClose(); setShowNotif(true); }}>Discard</button>
+                            <button className="btn btn--danger" type="button" onClick={() => { onClose(); setShowNotif(true); addToDrafts(formData)}}>Discard</button>
                         </div>
                     </div>
 

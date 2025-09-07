@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { FaTrash } from "react-icons/fa";
 import { BiBookOpen } from "react-icons/bi";
 import { AiFillEdit, AiOutlineClose } from "react-icons/ai"; 
-import './App.css';
 import DecryptedText from './components/DecryptedText';
 import Squares from './components/Squares.jsx';
 import ComposerModal from './components/ComposerModal.jsx';
 import ReadModal from './components/ReadModal.jsx';
 import postServices from './services/posts.js';
 import EditModal from './components/EditModal.jsx';
+import Drafts from './components/Drafts.jsx'
 import Trash from './components/Trash.jsx'
+import './App.css';
+
 
 const ensureTagArray = (tags) => {
   if (Array.isArray(tags)) return tags;
@@ -86,6 +88,8 @@ export default function App() {
   const [selectedPost, setSelectedPost] = useState(null);
   const [trashedPosts, setTrashedPosts] = useState([]);
   const [isTrashOpen, setIsTrashOpen] = useState(false);
+  const [draftedPosts, setDraftedPost] = useState([])
+  const [isDraftsOpen, setIsDraftOpen] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
 
   useEffect(() => {
@@ -101,7 +105,7 @@ export default function App() {
     return () => clearTimeout(timer);
   }, [showNotif]);
 
-console.log(showNotif)
+
   const [formData, setFormData] = useState({
     title: '',
     excerpt: '',
@@ -147,6 +151,35 @@ console.log(showNotif)
     postServices.deletePost?.(id).catch(() => { });
   };
 
+  const addToDrafts = (formData) => {
+    const now = new Date();
+    const date = now.toLocaleDateString('en-US');
+    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+    const words = (formData.content.trim() ? formData.content.trim().split(/\s+/).length : 0);
+    const read = `${Math.max(1, Math.ceil(words / 200))}MIN`;
+
+    const newPost = {
+      id: String(now.getTime()),
+      title: formData.title || 'Untitled',
+      date,
+      time,
+      read,
+      excerpt: formData.excerpt || formData.content.slice(0, 250),
+      content: formData.content,
+      tags: tagAssembler(formData.tags),
+      likes: 0,
+      comments: 0
+    };
+
+    setDraftedPost([...draftedPosts, newPost])
+  } 
+
+
+  const continueDraft = (id) => {
+    
+  }
+
   const restorePost = (id) => {
     const post = trashedPosts.find(p => p.id === id);
     if (!post) return;
@@ -178,6 +211,7 @@ console.log(showNotif)
     setIsComposerOpen(false);
     setIsEditorOpen(false);
     setIsReadModalOpen(false);
+    setIsDraftOpen(false)
     setIsTrashOpen(false); 
     setSelectedPost(null);
   };
@@ -243,7 +277,8 @@ console.log(showNotif)
     setIsComposerOpen(false);
   };
 
-  return (
+  console.log(isDraftsOpen)
+  return (  
     <>
 
       {showNotif && <div className="notification">Post has been saved in Drafts.</div>}
@@ -259,6 +294,7 @@ console.log(showNotif)
           setFormData={setFormData}
           onSubmit={handleModalSubmit}
           setShowNotif={setShowNotif}
+          addToDrafts={addToDrafts}
         />
       )}
 
@@ -280,6 +316,13 @@ console.log(showNotif)
           post={selectedPost}
         />
       )}
+
+      {isDraftsOpen && (<Drafts 
+      isOpen={isDraftsOpen}
+      onClose = {() => setIsDraftOpen(false)}
+      draftedPosts={draftedPosts}
+      onContinueDraft={continueDraft}
+      />)}
 
       {/* NEW: Trash modal mount */}
       {isTrashOpen && (
@@ -316,9 +359,9 @@ console.log(showNotif)
           <div className="post-action new-post" onClick={handleNewPost}>
             <span className="new-icon">+</span> New
           </div>
-          <div className="post-action">Drafts</div>
+          <div className="post-action" onClick ={() => setIsDraftOpen(true)}>Drafts<span className ="trash-count">{draftedPosts?.length < 999 ? draftedPosts?.length : '999+'}</span></div>
 
-          <div className="post-action" onClick={() => setIsTrashOpen(true)}>Trash <span className="trash-count">{trashedPosts.length < 999 ? trashedPosts.length : '999+'}</span></div>
+          <div className="post-action" onClick={() => setIsTrashOpen(true)}>Trash <span className="trash-count">{trashedPosts?.length < 999 ? trashedPosts.length : '999+'}</span></div>
 
           <div className="post-action">Export</div>
         </div>

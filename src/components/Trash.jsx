@@ -48,7 +48,7 @@ const Trash = ({
 
   return (
     <>
-      <div className="trash-backdrop" onClick={onClose} />
+      <div className="modal-backdrop" onClick={onClose} />
       <div
         className="trash-modal"
         role="dialog"
