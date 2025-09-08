@@ -7,10 +7,11 @@ const Trash = ({
   trashedPosts = [],
   onRestore,
   onDelete,
+  clear,
 }) => {
   const [query, setQuery] = useState("");
 
-  const [confirming, setConfirming] = useState(null); 
+  const [confirming, setConfirming] = useState(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -25,20 +26,20 @@ const Trash = ({
   const filtered = !q
     ? trashedPosts
     : trashedPosts.filter((p) => {
-        const title = (p.title || "").toLowerCase();
-        const excerpt = (p.excerpt || "").toLowerCase();
-        const tags = Array.isArray(p.tags)
-          ? p.tags.join(" ").toLowerCase()
-          : String(p.tags || "").toLowerCase();
-        return title.includes(q) || excerpt.includes(q) || tags.includes(q);
-      });
+      const title = (p.title || "").toLowerCase();
+      const excerpt = (p.excerpt || "").toLowerCase();
+      const tags = Array.isArray(p.tags)
+        ? p.tags.join(" ").toLowerCase()
+        : String(p.tags || "").toLowerCase();
+      return title.includes(q) || excerpt.includes(q) || tags.includes(q);
+    });
 
 
   const askConfirmDelete = (post) => {
     setConfirming({ id: post.id, title: post.title });
   };
 
- 
+
   const confirmDelete = () => {
     if (confirming && onDelete) {
       onDelete(confirming.id);
@@ -113,6 +114,10 @@ const Trash = ({
               ))}
             </ul>
           )}
+
+          <div className="draft-clear">
+            <button className="btn btn--danger" onClick={clear}>Clear</button>
+          </div>
         </div>
       </div>
 

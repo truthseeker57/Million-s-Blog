@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaTrash } from "react-icons/fa";
 import { BiBookOpen } from "react-icons/bi";
-import { AiFillEdit, AiOutlineClose } from "react-icons/ai"; 
+import { AiFillEdit, AiOutlineClose } from "react-icons/ai";
 import DecryptedText from './components/DecryptedText';
 import Squares from './components/Squares.jsx';
 import ComposerModal from './components/ComposerModal.jsx';
@@ -91,6 +91,7 @@ export default function App() {
   const [draftedPosts, setDraftedPost] = useState([])
   const [isDraftsOpen, setIsDraftOpen] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
+  const [existed, setExisted] = useState(false)
 
   useEffect(() => {
     const timer = setTimeout(() =>
@@ -99,7 +100,7 @@ export default function App() {
   }
     , [showNotif])
 
-      useEffect(() => {
+  useEffect(() => {
     if (!showNotif) return;
     const timer = setTimeout(() => setShowNotif(false), 4000);
     return () => clearTimeout(timer);
@@ -151,20 +152,24 @@ export default function App() {
     postServices.deletePost?.(id).catch(() => { });
   };
 
-  const addToDrafts = (formData) => {
+  const getMeta = (formData) => {
     const now = new Date();
     const date = now.toLocaleDateString('en-US');
     const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
     const words = (formData.content.trim() ? formData.content.trim().split(/\s+/).length : 0);
     const read = `${Math.max(1, Math.ceil(words / 200))}MIN`;
+    return { now, date, time, read }
+  }
 
+
+  const addToDrafts = (formData) => {
     const newPost = {
-      id: String(now.getTime()),
+      id: String(getMeta(formData).now.getTime()),
       title: formData.title || 'Untitled',
-      date,
-      time,
-      read,
+      date: getMeta(formData).date,
+      time: getMeta(formData).time,
+      read: getMeta(formData).read,
       excerpt: formData.excerpt || formData.content.slice(0, 250),
       content: formData.content,
       tags: tagAssembler(formData.tags),
@@ -173,12 +178,14 @@ export default function App() {
     };
 
     setDraftedPost([...draftedPosts, newPost])
-  } 
-
+  }
 
   const continueDraft = (id) => {
-     setIsDraftOpen(false)
-     setIsComposerOpen(true)
+    const post = draftedPosts.find(post => post.id === id)
+    setSelectedPost(post)
+    setIsEditorOpen(true)
+    setIsDraftOpen(false)
+    setExisted(true)
   }
 
   const restorePost = (id) => {
@@ -217,7 +224,7 @@ export default function App() {
     setIsEditorOpen(false);
     setIsReadModalOpen(false);
     setIsDraftOpen(false)
-    setIsTrashOpen(false); 
+    setIsTrashOpen(false);
     setSelectedPost(null);
   };
 
@@ -226,47 +233,72 @@ export default function App() {
     if (!selectedPost) return;
 
     const id = selectedPost.id;
-    const original = posts.find(p => p.id === id) || {}
+    const original = posts.find(p => p.id === id) || {
 
-    const updatedPost = {
-      ...original,
-      title: formData.title,
+    }
+
+
+    if (!existed) {
+      const updatedPost = {
+        ...original,
+        title: formData.title,
+        excerpt: formData.excerpt,
+        tags: tagAssembler(formData.tags),
+        content: formData.content
+      }
+
+      setPosts(prev => prev.map(p => (p.id === id ? updatedPost : p)));
+
+      try {
+        const resp = await postServices.editPost(id, updatedPost);
+        if (resp?.data) {
+          setPosts(prev => prev.map(p => (p.id === id ? resp.data : p)));
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setIsEditorOpen(false);
+        setSelectedPost(null);
+      }
+    } else {
+      const updatedDraft = {
+      id: String(getMeta(formData).now.getTime()),
+      title: formData.title || 'Untitled',
+      date: getMeta(formData).date,
+      time: getMeta(formData).time,
+      read: getMeta(formData).read,
       excerpt: formData.excerpt,
       tags: tagAssembler(formData.tags),
       content: formData.content,
-    }
-
-    setPosts(prev => prev.map(p => (p.id === id ? updatedPost : p)));
-
-    try {
-      const resp = await postServices.editPost(id, updatedPost);
-      if (resp?.data) {
-        setPosts(prev => prev.map(p => (p.id === id ? resp.data : p)));
+      likes: 0,
+      comments: 0
       }
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setIsEditorOpen(false);
-      setSelectedPost(null);
+
+      try{
+        postServices.createPost(updatedDraft).then(response => {
+        const created = { ...response, tags: ensureTagArray(response.tags) };
+        setPosts(prev => [...prev, created]);
+        })
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setIsEditorOpen(false)
+        setSelectedPost(null)
+        setExisted(false)
+
+        setDraftedPost(prev => prev.filter(p => p.id !== id))
+      }
     }
   }
 
   const handleModalSubmit = (e) => {
     e.preventDefault();
-
-    const now = new Date();
-    const date = now.toLocaleDateString('en-US');
-    const time = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-    const words = (formData.content.trim() ? formData.content.trim().split(/\s+/).length : 0);
-    const read = `${Math.max(1, Math.ceil(words / 200))}MIN`;
-
     const newPost = {
-      id: String(now.getTime()),
+      id: String(getMeta(formData).now.getTime()),
       title: formData.title || 'Untitled',
-      date,
-      time,
-      read,
+      date: getMeta(formData).date,
+      time: getMeta(formData).time,
+      read: getMeta(formData).read,
       excerpt: formData.excerpt || formData.content.slice(0, 250),
       content: formData.content,
       tags: tagAssembler(formData.tags),
@@ -283,7 +315,7 @@ export default function App() {
   };
 
   console.log(isDraftsOpen)
-  return (  
+  return (
     <>
 
       {showNotif && <div className="notification">Post has been saved in Drafts.</div>}
@@ -322,12 +354,12 @@ export default function App() {
         />
       )}
 
-      {isDraftsOpen && (<Drafts 
-      isOpen={isDraftsOpen}
-      onClose = {() => setIsDraftOpen(false)}
-      draftedPosts={draftedPosts}
-      onContinueDraft={continueDraft}
-      clear={clearDraft}
+      {isDraftsOpen && (<Drafts
+        isOpen={isDraftsOpen}
+        onClose={() => setIsDraftOpen(false)}
+        draftedPosts={draftedPosts}
+        onContinueDraft={continueDraft}
+        clear={clearDraft}
       />)}
 
       {/* NEW: Trash modal mount */}
@@ -338,6 +370,7 @@ export default function App() {
           trashedPosts={trashedPosts}
           onRestore={restorePost}
           onDelete={purgePost}
+          clear={clearDraft}
         />
       )}
 
@@ -365,7 +398,7 @@ export default function App() {
           <div className="post-action new-post" onClick={handleNewPost}>
             <span className="new-icon">+</span> New
           </div>
-          <div className="post-action" onClick ={() => setIsDraftOpen(true)}>Drafts<span className ="trash-count">{draftedPosts?.length < 999 ? draftedPosts?.length : '999+'}</span></div>
+          <div className="post-action" onClick={() => setIsDraftOpen(true)}>Drafts<span className="trash-count">{draftedPosts?.length < 999 ? draftedPosts?.length : '999+'}</span></div>
 
           <div className="post-action" onClick={() => setIsTrashOpen(true)}>Trash <span className="trash-count">{trashedPosts?.length < 999 ? trashedPosts.length : '999+'}</span></div>
 

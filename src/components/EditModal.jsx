@@ -47,7 +47,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, post, onSubmit }) =
             </h3>
             <div className="modal__actions">
               <button className="btn btn--primary" type="submit">
-                Update
+                Publish
               </button>
               <button className="btn btn--danger" type="button" onClick={onClose}>
                 Discard
