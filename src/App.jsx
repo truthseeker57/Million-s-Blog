@@ -177,7 +177,8 @@ export default function App() {
 
 
   const continueDraft = (id) => {
-    
+     setIsDraftOpen(false)
+     setIsComposerOpen(true)
   }
 
   const restorePost = (id) => {
@@ -192,6 +193,10 @@ export default function App() {
     const post = posts.find(p => p.id === id);
     setSelectedPost(post);
     setIsEditorOpen(true);
+  }
+
+  const clearDraft = () => {
+    setDraftedPost([])
   }
 
   const handleNewPost = () => {
@@ -322,6 +327,7 @@ export default function App() {
       onClose = {() => setIsDraftOpen(false)}
       draftedPosts={draftedPosts}
       onContinueDraft={continueDraft}
+      clear={clearDraft}
       />)}
 
       {/* NEW: Trash modal mount */}

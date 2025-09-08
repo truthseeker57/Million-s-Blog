@@ -901,6 +901,10 @@ h3 {
   color: #cfe3f0;
 }
 
+.draft-clear{
+  margin:1rem;
+}
+
 .btn-restore {
   border-color: #1a3a2b;
   background: linear-gradient(180deg, #0f1f17, #0d1913);

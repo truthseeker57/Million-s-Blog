@@ -6,7 +6,8 @@ const Drafts = ({
     isOpen,
     onClose,
     draftedPosts = [],
-    onContinueDraft
+    onContinueDraft, 
+    clear
 }) => {
     const [query, setQuery] = useState('')
 
@@ -21,11 +22,7 @@ const Drafts = ({
 
     if(!isOpen) return null;
 
-    const q = query.trim().toLowerCase()
-
-console.log("DRAFTED POSTS", draftedPosts);
-console.log("Type of draftedPosts:", typeof draftedPosts);
-console.log("Is draftedPosts an array?", Array.isArray(draftedPosts));
+const q = query.trim().toLowerCase()
 
 const filtered = !q
   ? draftedPosts
@@ -40,10 +37,6 @@ const filtered = !q
         title.includes(q) || excerpt.includes(q) || tags.includes(q)
       );
     });
-
-console.log("FILTERED", filtered);
-console.log("Type of filtered:", typeof filtered);
-console.log("Is filtered an array?", Array.isArray(filtered));
 
 
     return (
@@ -65,7 +58,7 @@ console.log("Is filtered an array?", Array.isArray(filtered));
                         <input className="draft-search"
                             value={query}
                             placeholder="Search drafts..."
-                            onChange={() => setQuery(e.target.value)} />
+                            onChange={(e) => setQuery(e.target.value)} />
 
                         <button className="icon-btn draft-close" onClick={onClose} aria-label="Close">
                             <AiOutlineClose size={18} />
@@ -95,18 +88,19 @@ console.log("Is filtered an array?", Array.isArray(filtered));
                                     </div>
 
                                     <div className="drafted-item__actions">
-                                        <button className="btn btn-edit" onClick={() => onContinueDraft(post.id)}>Continue</button>
+                                        <button className="btn btn-edit" onClick={() => onContinueDraft(post.id)}>Continue Editing</button>
                                         </div>
                             </li>
                         ))}
 
                     </ul>
-            
                 )
 
                     }
                 </div>
-
+                    <div className="draft-clear">
+                    <button className="btn btn--danger" onClick={clear}>Clear</button>
+                    </div>
             </div>
         </>
     )
