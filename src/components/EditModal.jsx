@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const EditModal = ({ isOpen, onClose, formData, setFormData, post, onSubmit }) => {
+const EditModal = ({ isOpen, onClose, formData, setFormData, post, onSubmit, addToDrafts }) => {
   if (!isOpen) return null;
 
 
@@ -49,7 +49,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, post, onSubmit }) =
               <button className="btn btn--primary" type="submit">
                 Publish
               </button>
-              <button className="btn btn--danger" type="button" onClick={onClose}>
+              <button className="btn btn--danger" type="button" onClick={()=> {onClose(); addToDrafts(formData)}}>
                 Discard
               </button>
             </div>

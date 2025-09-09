@@ -164,6 +164,24 @@ export default function App() {
 
 
   const addToDrafts = (formData) => {
+
+    //check if it existed here and traverse array
+    let draft = draftedPosts.find(post => post.id === formData.id)
+
+    if(draft){
+      draft = {...draft, 
+        title: formData.title || 'Untitled',
+        date: getMeta(formData).date,
+        time: getMeta(formData).time,
+        read: getMeta(formData).read,
+        excerpt: formData.excerpt || formData.content.slice(0, 250),
+        content: formData.content,
+        tags: tagAssembler(formData.tags)
+      }
+        setDraftedPost(prev => prev.map(post => post.id === formData.id ? draft : post))
+    }
+    else{
+
     const newPost = {
       id: String(getMeta(formData).now.getTime()),
       title: formData.title || 'Untitled',
@@ -178,7 +196,7 @@ export default function App() {
     };
 
     setDraftedPost([...draftedPosts, newPost])
-  }
+  }}
 
   const continueDraft = (id) => {
     const post = draftedPosts.find(post => post.id === id)
@@ -351,6 +369,7 @@ export default function App() {
           setFormData={setFormData}
           onSubmit={handleContentUpdate}
           post={selectedPost}
+          addToDrafts={addToDrafts}
         />
       )}
 

@@ -43,46 +43,6 @@
       ],
       "likes": 23,
       "comments": 4
-    },
-    {
-      "id": "1757300683550",
-      "title": "sdfgasd",
-      "date": "9/7/2025",
-      "time": "10:04 PM",
-      "read": "1MIN",
-      "excerpt": "",
-      "tags": [],
-      "content": "sadfasdf",
-      "likes": 0,
-      "comments": 0
-    },
-    {
-      "id": "1757300761382",
-      "title": "Beamlishu",
-      "date": "9/7/2025",
-      "time": "10:06 PM",
-      "read": "1MIN",
-      "excerpt": "She is so pretty",
-      "content": "I love her. Because she is the best person in the world. ",
-      "tags": [
-        "QONJO"
-      ],
-      "likes": 0,
-      "comments": 0
-    },
-    {
-      "id": "1757300849129",
-      "title": "sadf",
-      "date": "9/7/2025",
-      "time": "10:07 PM",
-      "read": "1MIN",
-      "excerpt": "sadfasdf",
-      "tags": [
-        "SADFASDF"
-      ],
-      "content": "",
-      "likes": 0,
-      "comments": 0
     }
   ]
 }
