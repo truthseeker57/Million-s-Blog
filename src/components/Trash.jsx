@@ -7,7 +7,7 @@ const Trash = ({
   trashedPosts = [],
   onRestore,
   onDelete,
-  clear,
+  clear
 }) => {
   const [query, setQuery] = useState("");
 

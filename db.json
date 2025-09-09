@@ -43,6 +43,139 @@
       ],
       "likes": 23,
       "comments": 4
+    },
+    {
+      "id": "1757438374188",
+      "title": "Untitled",
+      "date": "9/9/2025",
+      "time": "12:19 PM",
+      "read": "1MIN",
+      "excerpt": "",
+      "content": "",
+      "tags": [],
+      "likes": 0,
+      "comments": 0
+    },
+    {
+      "id": "4",
+      "title": "ASYNC-JS-DEEPDIVE.TXT",
+      "date": "09/01/2025",
+      "time": "02:10 PM",
+      "read": "8MIN",
+      "excerpt": "A full breakdown of async patterns in JS: callbacks, promises, and async/await.",
+      "content": "Asynchronous programming in JavaScript enables non-blocking operations. It starts with callbacks, then evolves to promises, and finally async/await for cleaner syntax. Each phase has pros and cons...",
+      "tags": ["JAVASCRIPT"],
+      "likes": 28,
+      "comments": 5
+    },
+    {
+      "id": "5",
+      "title": "FLUTTER-STATE-MGMT.TXT",
+      "date": "09/02/2025",
+      "time": "09:45 AM",
+      "read": "5MIN",
+      "excerpt": "Quick comparison of Provider, Riverpod, Bloc, and setState.",
+      "content": "Choosing state management in Flutter depends on your app’s complexity. setState works for small widgets, Provider is a mid-tier solution, Bloc is more structured, and Riverpod is gaining popularity...",
+      "tags": ["FLUTTER", "STATE"],
+      "likes": 16,
+      "comments": 1
+    },
+    {
+      "id": "6",
+      "title": "BUG-HUNTING-STRATEGIES.TXT",
+      "date": "09/03/2025",
+      "time": "04:20 PM",
+      "read": "3MIN",
+      "excerpt": "How to track down those elusive bugs in complex systems.",
+      "content": "Reproducing bugs reliably is key. Use binary search within commits to isolate regressions. Log everything. When in doubt, simplify the problem...",
+      "tags": ["DEBUGGING"],
+      "likes": 5,
+      "comments": 0
+    },
+    {
+      "id": "7",
+      "title": "EMPTY-POST-FIELDS.TXT",
+      "date": "09/04/2025",
+      "time": "10:00 AM",
+      "read": "",
+      "excerpt": "",
+      "content": "",
+      "tags": [],
+      "likes": 0,
+      "comments": 0
+    },
+    {
+      "id": "8",
+      "title": "A-VERY-LONG-TITLE-THAT-GOES-ON-AND-ON-TO-TEST-LAYOUT-BREAKING.TXT",
+      "date": "09/05/2025",
+      "time": "03:30 PM",
+      "read": "4MIN",
+      "excerpt": "A test for really long titles and UI wrapping.",
+      "content": "This is just to test how the UI handles super long titles that may overflow or break containers depending on your CSS...",
+      "tags": ["UI"],
+      "likes": 7,
+      "comments": 2
+    },
+    {
+      "id": "9",
+      "title": "🔥🔥-UNICODE-TEST.TXT",
+      "date": "09/06/2025",
+      "time": "12:15 PM",
+      "read": "2MIN",
+      "excerpt": "Can your app handle Unicode and emoji?",
+      "content": "Here’s a post full of emojis: 🚀🔥💡✨🐍👨‍💻 and other multilingual text like こんにちは, مرحبًا, שלום",
+      "tags": ["TEST"],
+      "likes": 3,
+      "comments": 0
+    },
+    {
+      "id": "10",
+      "title": "FUTURE-OF-AI.TXT",
+      "date": "09/07/2025",
+      "time": "01:00 PM",
+      "read": "9MIN",
+      "excerpt": "Exploring AI ethics, LLMs, and the road to AGI.",
+      "content": "As AI grows more powerful, ethical frameworks must evolve. LLMs like ChatGPT are stepping stones. However, we must ensure transparency, fairness, and avoid misuse...",
+      "tags": ["AI", "ETHICS"],
+      "likes": 45,
+      "comments": 13
+    },
+    {
+      "id": "11",
+      "title": "TAGS-MISSING.TXT",
+      "date": "09/08/2025",
+      "time": "05:00 PM",
+      "read": "1MIN",
+      "excerpt": "Just to test empty tags.",
+      "content": "This post has no tags.",
+      "tags": [],
+      "likes": 1,
+      "comments": 0
+    },
+    {
+      "id": "12",
+      "title": "MINIMAL.TXT",
+      "date": "09/09/2025",
+      "time": "08:00 AM",
+      "read": "1MIN",
+      "excerpt": "",
+      "content": "Minimal content to check lowest limits.",
+      "tags": [],
+      "likes": 0,
+      "comments": 0
+    },
+    {
+      "id": "13",
+      "title": "MASSIVE-CONTENT.TXT",
+      "date": "09/10/2025",
+      "time": "02:22 PM",
+      "read": "12MIN",
+      "excerpt": "Large block of content for scroll testing.",
+      "content": "Lorem ipsum ",
+      "tags": ["STRESS", "LARGE"],
+      "likes": 100,
+      "comments": 25
     }
   ]
 }
+

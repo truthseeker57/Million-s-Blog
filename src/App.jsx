@@ -45,7 +45,7 @@ const Search = ({ onChange }) => (
   </div>
 );
 
-const PostItem = ({ posts, onDelete, onRead, onEdit }) => (
+const PostItem = ({ posts, onDelete, onRead, onEdit, setShowNotif }) => (
   <div>
     {posts.map((post) => (
       <div className="post-block" key={post.id}>
@@ -69,7 +69,7 @@ const PostItem = ({ posts, onDelete, onRead, onEdit }) => (
           <button className="post-action-btn edit" onClick={() => onEdit(post.id)} aria-label="Edit post">
             <AiFillEdit />
           </button>
-          <button className="post-action-btn del" onClick={() => onDelete(post.id)} aria-label="Move post to Trash">
+          <button className="post-action-btn del" onClick={() => {onDelete(post.id); setShowNotif(true)}} aria-label="Move post to Trash">
             <FaTrash />
           </button>
         </div>
@@ -92,6 +92,7 @@ export default function App() {
   const [isDraftsOpen, setIsDraftOpen] = useState(false)
   const [showNotif, setShowNotif] = useState(false)
   const [existed, setExisted] = useState(false)
+  const [notifMessage, setNotifMessage] = useState('')
 
   useEffect(() => {
     const timer = setTimeout(() =>
@@ -138,6 +139,7 @@ export default function App() {
   };
 
   const moveToTrash = (id) => {
+    setNotifMessage("Post has been moved to trash.")
     const post = posts.find(p => p.id === id);
     if (!post) return;
 
@@ -165,7 +167,7 @@ export default function App() {
 
   const addToDrafts = (formData) => {
 
-    //check if it existed here and traverse array
+    setNotifMessage("Post has been moved to drafts.")
     let draft = draftedPosts.find(post => post.id === formData.id)
 
     if(draft){
@@ -311,6 +313,8 @@ export default function App() {
 
   const handleModalSubmit = (e) => {
     e.preventDefault();
+    setShowNotif(true)
+    setNotifMessage("Post has been published.")
     const newPost = {
       id: String(getMeta(formData).now.getTime()),
       title: formData.title || 'Untitled',
@@ -323,6 +327,7 @@ export default function App() {
       likes: 0,
       comments: 0
     };
+        setNotifMessage("Post has been published.")
 
     postServices.createPost(newPost).then(response => {
       const created = { ...response, tags: ensureTagArray(response.tags) };
@@ -336,7 +341,7 @@ export default function App() {
   return (
     <>
 
-      {showNotif && <div className="notification">Post has been saved in Drafts.</div>}
+      {showNotif && <div className="notification">{notifMessage}</div>}
 
 
 
@@ -369,6 +374,7 @@ export default function App() {
           setFormData={setFormData}
           onSubmit={handleContentUpdate}
           post={selectedPost}
+          setShowNotif={setShowNotif}
           addToDrafts={addToDrafts}
         />
       )}
@@ -429,6 +435,7 @@ export default function App() {
           onDelete={moveToTrash}
           onRead={readPost}
           onEdit={editPost}
+          setShowNotif={setShowNotif}
         />
 
         {posts.length === 0 && (
