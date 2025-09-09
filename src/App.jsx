@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { FaTrash } from "react-icons/fa";
 import { BiBookOpen } from "react-icons/bi";
-import { AiFillEdit, AiOutlineClose } from "react-icons/ai";
+import { AiFillEdit, AiOutlineClose, AiOutlineStar, AiFillStar } from "react-icons/ai";
 import DecryptedText from './components/DecryptedText';
 import Squares from './components/Squares.jsx';
 import ComposerModal from './components/ComposerModal.jsx';
@@ -11,7 +11,6 @@ import EditModal from './components/EditModal.jsx';
 import Drafts from './components/Drafts.jsx'
 import Trash from './components/Trash.jsx'
 import './App.css';
-
 
 const ensureTagArray = (tags) => {
   if (Array.isArray(tags)) return tags;
@@ -25,7 +24,7 @@ const ensureTagArray = (tags) => {
 
 const Navigation = () => (
   <nav className="nav">
-    <span className="path">C:\\BLOG&gt;</span>
+    <span className="path">C:\\LOG&gt;</span>
     <a href="#">posts</a>
     <a href="#">archive</a>
     <a href="#">shower_thoughts</a>
@@ -45,12 +44,44 @@ const Search = ({ onChange }) => (
   </div>
 );
 
-const PostItem = ({ posts, onDelete, onRead, onEdit, setShowNotif }) => (
+
+const FeaturedStrip = ({ posts, onRead }) => {
+  if (!posts.length) return null;
+  return (
+    <section className="featured">
+      <div className="featured-title">C:\\LOG&gt; featured</div>
+      <div className="featured-grid">
+        {posts.map(p => (
+          <button
+            key={p.id}
+            className="featured-card"
+            onClick={() => onRead(p.id)}
+            aria-label={`Open ${p.title}`}
+          >
+            <div className="featured-header">
+              <span className="featured-dot" />
+              <span className="featured-dot" />
+              <span className="featured-dot" />
+            </div>
+            <div className="featured-body">
+              <div className="featured-name">{p.title}</div>
+              <div className="featured-meta">{p.date} · {p.read || '—'}</div>
+              <div className="featured-tags">{Array.isArray(p.tags) ? p.tags.join(', ') : ''}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+      <div className="divider">----------------------------------------------------------------</div>
+    </section>
+  );
+};
+
+const PostItem = ({ posts, onDelete, onRead, onEdit, onToggleFeatured, setShowNotif }) => (
   <div>
     {posts.map((post) => (
       <div className="post-block" key={post.id}>
         <div className="post-header">
-          <DecryptedText text={post.title} /> &nbsp; &nbsp; &nbsp; &nbsp;
+          {post.title}&nbsp; &nbsp; &nbsp; &nbsp;
           {post.date} &nbsp; {post.time} &nbsp; {post.read} &nbsp;
         </div>
         <div className="divider">----------------------------------------------------------------</div>
@@ -69,7 +100,17 @@ const PostItem = ({ posts, onDelete, onRead, onEdit, setShowNotif }) => (
           <button className="post-action-btn edit" onClick={() => onEdit(post.id)} aria-label="Edit post">
             <AiFillEdit />
           </button>
-          <button className="post-action-btn del" onClick={() => {onDelete(post.id); setShowNotif(true)}} aria-label="Move post to Trash">
+
+          <button
+            className={`post-action-btn ${post.featured ? 'starred' : 'star'}`}
+            onClick={() => onToggleFeatured(post)}
+            aria-label={post.featured ? 'Unfeature post' : 'Feature post'}
+            title={post.featured ? 'Unfeature' : 'Feature'}
+          >
+            {post.featured ? <AiFillStar /> : <AiOutlineStar />}
+          </button>
+
+          <button className="post-action-btn del" onClick={() => { onDelete(post.id); setShowNotif(true) }} aria-label="Move post to Trash">
             <FaTrash />
           </button>
         </div>
@@ -77,7 +118,6 @@ const PostItem = ({ posts, onDelete, onRead, onEdit, setShowNotif }) => (
     ))}
   </div>
 );
-
 
 export default function App() {
   const [posts, setPosts] = useState([]);
@@ -98,15 +138,7 @@ export default function App() {
     const timer = setTimeout(() =>
       setShowNotif(false), 4000)
     return () => clearTimeout(timer)
-  }
-    , [showNotif])
-
-  useEffect(() => {
-    if (!showNotif) return;
-    const timer = setTimeout(() => setShowNotif(false), 4000);
-    return () => clearTimeout(timer);
-  }, [showNotif]);
-
+  }, [showNotif])
 
   const [formData, setFormData] = useState({
     title: '',
@@ -115,19 +147,29 @@ export default function App() {
     content: '',
   });
 
-  useEffect(() => {
-    postServices.getAll().then(initialPosts => {
-      setPosts(initialPosts.map(p => ({ ...p, tags: ensureTagArray(p.tags) })));
+  const loadPosts = () => {
+    postServices.getAll('posts').then(initial => {
+      setPosts(initial.map(p => ({ ...p, tags: ensureTagArray(p.tags), featured: !!p.featured })));
     });
+    postServices.getAll('trash').then(initial => {
+      setTrashedPosts(initial.map(p => ({ ...p, tags: ensureTagArray(p.tags), featured: !!p.featured })))
+    })
+    postServices.getAll('draft').then(initial => {
+      setDraftedPost(initial.map(p => ({...p, tags: ensureTagArray(p.tags), featured: !!p.featured})))
+    })
+  };
+
+  useEffect(() => {
+    loadPosts();
   }, []);
 
   const handleSearch = (event) => {
     const searchedItem = event.target.value.toLowerCase();
     setQuery(searchedItem);
-    postServices.getAll().then(all =>
+    postServices.getAll('posts').then(all =>
       setPosts(
         all
-          .map(p => ({ ...p, tags: ensureTagArray(p.tags) }))
+          .map(p => ({ ...p, tags: ensureTagArray(p.tags), featured: !!p.featured }))
           .filter(post => (post.title || '').toLowerCase().includes(searchedItem))
       )
     );
@@ -143,15 +185,19 @@ export default function App() {
     const post = posts.find(p => p.id === id);
     if (!post) return;
 
-    setPosts(prev => prev.filter(p => p.id !== id));
-    setTrashedPosts(prev => [{ ...post }, ...prev]);
-
-    postServices.trashPost?.(id).catch(() => { });
+    postServices.createPost('trash', post).then(() => {
+      postServices.deletePost('posts', id).then(() => {
+        setPosts(prev => prev.filter(p => p.id !== id));
+        setTrashedPosts(prev => [{ ...post }, ...prev]);
+      })
+    })
   };
 
   const purgePost = (id) => {
-    setTrashedPosts(prev => prev.filter(p => p.id !== id));
-    postServices.deletePost?.(id).catch(() => { });
+    postServices.deletePost('trash', id).then(() => {
+      setTrashedPosts(prev => prev.filter(p => p.id !== id));
+      postServices.deletePost?.('posts', id).catch(() => { });
+    })
   };
 
   const getMeta = (formData) => {
@@ -164,14 +210,13 @@ export default function App() {
     return { now, date, time, read }
   }
 
-
   const addToDrafts = (formData) => {
-
     setNotifMessage("Post has been moved to drafts.")
     let draft = draftedPosts.find(post => post.id === formData.id)
 
-    if(draft){
-      draft = {...draft, 
+    if (draft) {
+      draft = {
+        ...draft,
         title: formData.title || 'Untitled',
         date: getMeta(formData).date,
         time: getMeta(formData).time,
@@ -180,25 +225,31 @@ export default function App() {
         content: formData.content,
         tags: tagAssembler(formData.tags)
       }
-        setDraftedPost(prev => prev.map(post => post.id === formData.id ? draft : post))
+      postServices.createPost('draft', draft).then(() => {
+        postServices.deletePost('draft', draft.id).then(() => {
+            setDraftedPost(prev => prev.map(post => post.id === formData.id ? draft : post))
+        })
+      })
     }
-    else{
-
-    const newPost = {
-      id: String(getMeta(formData).now.getTime()),
-      title: formData.title || 'Untitled',
-      date: getMeta(formData).date,
-      time: getMeta(formData).time,
-      read: getMeta(formData).read,
-      excerpt: formData.excerpt || formData.content.slice(0, 250),
-      content: formData.content,
-      tags: tagAssembler(formData.tags),
-      likes: 0,
-      comments: 0
-    };
-
-    setDraftedPost([...draftedPosts, newPost])
-  }}
+    else {
+      const newPost = {
+        id: String(getMeta(formData).now.getTime()),
+        title: formData.title || 'Untitled',
+        date: getMeta(formData).date,
+        time: getMeta(formData).time,
+        read: getMeta(formData).read,
+        excerpt: formData.excerpt || formData.content.slice(0, 250),
+        content: formData.content,
+        tags: tagAssembler(formData.tags),
+        likes: 0,
+        comments: 0,
+        featured: false,
+      };
+      postServices.createPost('draft', newPost).then(() => {
+        setDraftedPost([...draftedPosts, newPost])
+      })
+    }
+  }
 
   const continueDraft = (id) => {
     const post = draftedPosts.find(post => post.id === id)
@@ -211,9 +262,14 @@ export default function App() {
   const restorePost = (id) => {
     const post = trashedPosts.find(p => p.id === id);
     if (!post) return;
-    setTrashedPosts(prev => prev.filter(p => p.id !== id));
-    setPosts(prev => [post, ...prev]);
-    postServices.restorePost?.(id).catch(() => { });
+
+    postServices.deletePost('trash', id).then(() => {
+      postServices.createPost('posts', post).then(() => {
+        setTrashedPosts(prev => prev.filter(p => p.id !== id));
+        setPosts(prev => [post, ...prev]);
+      })
+    })
+
   };
 
   const editPost = (id) => {
@@ -223,7 +279,17 @@ export default function App() {
   }
 
   const clearDraft = () => {
-    setDraftedPost([])
+    postServices.deleteAll('draft').then(() => {
+      setDraftedPost([])
+    })
+
+  }
+
+  const clearTrash = () => {
+    postServices.deleteAll('trash').then(() => {
+      setTrashedPosts([])
+    })
+
   }
 
   const handleNewPost = () => {
@@ -253,26 +319,26 @@ export default function App() {
     if (!selectedPost) return;
 
     const id = selectedPost.id;
-    const original = posts.find(p => p.id === id) || {
-
-    }
-
+    const original = posts.find(p => p.id === id) || {};
+    const meta = getMeta(formData);
 
     if (!existed) {
       const updatedPost = {
         ...original,
         title: formData.title,
-        excerpt: formData.excerpt,
+        excerpt: formData.excerpt || formData.content.slice(0, 250),
         tags: tagAssembler(formData.tags),
         content: formData.content
-      }
-
-      setPosts(prev => prev.map(p => (p.id === id ? updatedPost : p)));
+      };
 
       try {
-        const resp = await postServices.editPost(id, updatedPost);
-        if (resp?.data) {
-          setPosts(prev => prev.map(p => (p.id === id ? resp.data : p)));
+        const data = await postServices.editPost('posts', id, updatedPost);
+        if (data) {
+          setPosts(prev =>
+            prev.map(p =>
+              p.id === id ? { ...data, tags: ensureTagArray(data.tags) } : p
+            )
+          );
         }
       } catch (err) {
         console.error(err);
@@ -281,37 +347,35 @@ export default function App() {
         setSelectedPost(null);
       }
     } else {
-      const updatedDraft = {
-      id: String(getMeta(formData).now.getTime()),
-      title: formData.title || 'Untitled',
-      date: getMeta(formData).date,
-      time: getMeta(formData).time,
-      read: getMeta(formData).read,
-      excerpt: formData.excerpt,
-      tags: tagAssembler(formData.tags),
-      content: formData.content,
-      likes: 0,
-      comments: 0
-      }
+      const newPost = {
+        id: String(meta.now.getTime()),
+        title: formData.title || 'Untitled',
+        date: meta.date,
+        time: meta.time,
+        read: meta.read,
+        excerpt: formData.excerpt || formData.content.slice(0, 250),
+        tags: tagAssembler(formData.tags),
+        content: formData.content,
+        likes: 0,
+        comments: 0,
+        featured: false,
+      };
 
-      try{
-        postServices.createPost(updatedDraft).then(response => {
-        const created = { ...response, tags: ensureTagArray(response.tags) };
-        setPosts(prev => [...prev, created]);
-        })
+      try {
+        const created = await postServices.createPost('posts', newPost);
+        setPosts(prev => [...prev, { ...created, tags: ensureTagArray(created.tags) }]);
       } catch (err) {
-        console.error(err)
+        console.error(err);
       } finally {
-        setIsEditorOpen(false)
-        setSelectedPost(null)
-        setExisted(false)
-
-        setDraftedPost(prev => prev.filter(p => p.id !== id))
+        setIsEditorOpen(false);
+        setSelectedPost(null);
+        setExisted(false);
+        setDraftedPost(prev => prev.filter(p => p.id !== id));
       }
     }
-  }
+  };
 
-  const handleModalSubmit = (e) => {
+  const handleModalSubmit = async (e) => {
     e.preventDefault();
     setShowNotif(true)
     setNotifMessage("Post has been published.")
@@ -325,26 +389,36 @@ export default function App() {
       content: formData.content,
       tags: tagAssembler(formData.tags),
       likes: 0,
-      comments: 0
+      comments: 0,
+      featured: false,
     };
-        setNotifMessage("Post has been published.")
 
-    postServices.createPost(newPost).then(response => {
-      const created = { ...response, tags: ensureTagArray(response.tags) };
-      setPosts(prev => [...prev, created]);
-    });
-
+    const created = await postServices.createPost('posts', newPost);
+    const normalized = { ...created, tags: ensureTagArray(created.tags), featured: !!created.featured };
+    setPosts(prev => [...prev, normalized]);
     setIsComposerOpen(false);
   };
 
-  console.log(isDraftsOpen)
+
+  const toggleFeatured = async (post) => {
+    const updated = { ...post, featured: !post.featured };
+    setPosts(prev => prev.map(p => p.id === post.id ? updated : p));
+    try {
+      const data = await postServices.editPost('posts', post.id, updated);
+      if (data) {
+        setPosts(prev => prev.map(p => p.id === post.id ? { ...data, tags: ensureTagArray(data.tags), featured: !!data.featured } : p));
+      }
+    } catch (e) {
+      setPosts(prev => prev.map(p => p.id === post.id ? post : p));
+      console.error(e);
+    }
+  };
+
+  const featuredPosts = posts.filter(p => p.featured);
+
   return (
     <>
-
       {showNotif && <div className="notification">{notifMessage}</div>}
-
-
-
 
       {isComposerOpen && (
         <ComposerModal
@@ -387,7 +461,6 @@ export default function App() {
         clear={clearDraft}
       />)}
 
-      {/* NEW: Trash modal mount */}
       {isTrashOpen && (
         <Trash
           isOpen={isTrashOpen}
@@ -395,7 +468,7 @@ export default function App() {
           trashedPosts={trashedPosts}
           onRestore={restorePost}
           onDelete={purgePost}
-          clear={clearDraft}
+          clear={clearTrash}
         />
       )}
 
@@ -419,28 +492,39 @@ export default function App() {
       </header>
 
       <main className="container">
-        <div className="post-toolbar">
-          <div className="post-action new-post" onClick={handleNewPost}>
-            <span className="new-icon">+</span> New
-          </div>
-          <div className="post-action" onClick={() => setIsDraftOpen(true)}>Drafts<span className="trash-count">{draftedPosts?.length < 999 ? draftedPosts?.length : '999+'}</span></div>
+        <div className="layout">
+          <aside className="featured-col">
+            <FeaturedStrip posts={featuredPosts} onRead={readPost} />
+          </aside>
 
-          <div className="post-action" onClick={() => setIsTrashOpen(true)}>Trash <span className="trash-count">{trashedPosts?.length < 999 ? trashedPosts.length : '999+'}</span></div>
+          <section className="content-col">
+            <div className="post-toolbar">
+              <div className="post-action new-post" onClick={handleNewPost}>
+                <DecryptedText text={`+ New`} />
+              </div>
+              <div className="post-action" onClick={() => setIsDraftOpen(true)}>
+                <DecryptedText text={`Drafts`} /><span className="trash-count">{draftedPosts?.length < 999 ? draftedPosts?.length : '999+'}</span>
+              </div>
+              <div className="post-action" onClick={() => setIsTrashOpen(true)}>
+                <DecryptedText text={`Trash`} /><span className="trash-count">{trashedPosts?.length < 999 ? trashedPosts.length : '999+'}</span>
+              </div>
+              <div className="post-action"><DecryptedText text={`Export`} /></div>
+            </div>
 
-          <div className="post-action">Export</div>
+            <PostItem
+              posts={posts}
+              onDelete={moveToTrash}
+              onRead={readPost}
+              onEdit={editPost}
+              onToggleFeatured={toggleFeatured}
+              setShowNotif={setShowNotif}
+            />
+
+            {posts.length === 0 && (
+              <p className="empty">No matches for “{query}”.</p>
+            )}
+          </section>
         </div>
-
-        <PostItem
-          posts={posts}
-          onDelete={moveToTrash}
-          onRead={readPost}
-          onEdit={editPost}
-          setShowNotif={setShowNotif}
-        />
-
-        {posts.length === 0 && (
-          <p className="empty">No matches for “{query}”.</p>
-        )}
       </main>
     </>
   );

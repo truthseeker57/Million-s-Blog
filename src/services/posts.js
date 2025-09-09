@@ -1,27 +1,32 @@
 import axios from 'axios'
 
-const baseURL = 'http://localhost:3001/posts'
+const baseURL = 'http://localhost:3001/'
 
 
-const getAll = () => {
-    const req = axios.get(baseURL)
+const getAll = (collection) => {
+    const req = axios.get(`${baseURL}${collection}`)
     return req.then(response => response.data) 
 }
 
-const createPost = (post) => {
-    const req = axios.post(baseURL, post)
+const createPost = (collection, post) => {
+    const req = axios.post(`${baseURL}${collection}`, post)
     return req.then(response => response.data)
 }
 
-const editPost = (post, newItem) => {
-    const req = axios.put(`${baseURL}/${post}`, newItem)
+const editPost = (collection, post, newItem) => {
+    const req = axios.put(`${baseURL}${collection}/${post}`, newItem)
     return req.then(response => response.data)
 }
 
-const deletePost = (postId) => {
-    const req = axios.delete(`${baseURL}/${postId}`)
+const deletePost = (collection, postId) => {
+    const req = axios.delete(`${baseURL}${collection}/${postId}`)
     return req.then(response => response.data)
 }
 
+const deleteAll = async (collection) => {
+  const { data } = await axios.get(`${baseURL}${collection}`);
+  await Promise.all(data.map(item => axios.delete(`${baseURL}${collection}/${item.id}`)));
+};
 
-export default { getAll, createPost, editPost, deletePost }
+
+export default { getAll, createPost, editPost, deletePost, deleteAll }

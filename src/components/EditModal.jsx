@@ -29,10 +29,10 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, post, onSubmit, set
 
   return (
     <>
-      {/* Backdrop */}
+
       <div className="modal-backdrop" onClick={onClose} />
 
-      {/* Modal panel */}
+
       <div
         className="modal"
         role="dialog"
@@ -55,7 +55,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, post, onSubmit, set
             </div>
           </div>
 
-          {/* Body */}
+
           <div className="modal__body">
             <section className="composer">
               <div className="field">
@@ -102,7 +102,7 @@ const EditModal = ({ isOpen, onClose, formData, setFormData, post, onSubmit, set
               </div>
             </section>
 
-            {/* Preview */}
+
             <aside className="preview">
               <h2 className="preview__title">{formData?.title || "Untitled"}</h2>
               <div className="preview__meta">

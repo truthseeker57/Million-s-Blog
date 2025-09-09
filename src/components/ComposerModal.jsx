@@ -4,11 +4,9 @@ const ComposerModal = ({ isOpen, onClose, formData, setFormData, onSubmit, setSh
 
     return (
         <>
-            {/* Backdrop */}
             <div className="modal-backdrop" onClick={onClose} />
 
 
-            {/* Modal panel */}
             <div
                 className="modal"
                 role="dialog"
@@ -16,7 +14,6 @@ const ComposerModal = ({ isOpen, onClose, formData, setFormData, onSubmit, setSh
                 aria-labelledby="composer-title"
                 onClick={(e) => e.stopPropagation()}
             >
-                {/* ONE form that wraps header + body + footer */}
                 <form id="composer-form" onSubmit={onSubmit}>
 
                     <div className="modal__header">
@@ -27,7 +24,7 @@ const ComposerModal = ({ isOpen, onClose, formData, setFormData, onSubmit, setSh
                         </div>
                     </div>
 
-                    {/* Body */}
+
                     <div className="modal__body">
                         <section className="composer">
                             <div className="field">
@@ -70,7 +67,7 @@ const ComposerModal = ({ isOpen, onClose, formData, setFormData, onSubmit, setSh
                             </div>
                         </section>
 
-                        {/* Preview */}
+
                         <aside className="preview">
                             <h2 className="preview__title">{formData.title || 'Untitled'}</h2>
                             <div className="preview__meta">

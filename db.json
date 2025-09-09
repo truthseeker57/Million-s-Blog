@@ -1,19 +1,139 @@
 {
   "posts": [
     {
-      "id": "1",
-      "title": "DEPLOYING-A-SPRING-API.TXT",
-      "date": "07/30/2025",
-      "time": "03:22 PM",
-      "read": "6MIN",
-      "content": "When you finish building a Spring Boot API, the next step is deployment. Deployment is about making your application accessible to users, whether on the cloud, a server, or locally within an organization. Here are the common steps and options for deploying a Spring API:\n\n1. Build the Application\nUse Maven or Gradle to package your app.\n\nExample:\n\nbash\nCopy\nEdit\nmvn clean package\nThis generates a JAR (or WAR) file inside the target directory.\n\n2. Run as a Standalone JAR\nSpring Boot comes with an embedded server (Tomcat by default), so you can run it directly:\n\nbash\nCopy\nEdit\njava -jar target/my-api-0.0.1-SNAPSHOT.jar\n3. Deploy on a Server\nIf you’re using an application server like Tomcat or WildFly, package as a WAR and drop it in the server’s webapps folder.\n\n4. Use Docker for Deployment\nContainerization makes deployment easier across environments.\n\nCreate a Dockerfile:\n\ndockerfile\nCopy\nEdit\nFROM openjdk:17-jdk-slim\nCOPY target/my-api-0.0.1-SNAPSHOT.jar app.jar\nENTRYPOINT [\"java\",\"-jar\",\"/app.jar\"]\nBuild and run:\n\nbash\nCopy\nEdit\ndocker build -t my-spring-api .\ndocker run -p 8080:8080 my-spring-api\n5. Deploy to Cloud Platforms\nAWS Elastic Beanstalk: Upload JAR/WAR and let AWS handle scaling.\n\nHeroku: Push code with Git and add a Procfile to run the app.\n\nGoogle Cloud Run / Kubernetes: Deploy Docker images for auto-scaling APIs.\n\nAzure App Service: Deploy using Maven or Docker directly.\n\n6. Configure Environment Variables\nInstead of hardcoding, store sensitive info like DB credentials or API keys in environment variables or config files. Example for Linux:\n\nbash\nCopy\nEdit\nexport SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/mydb\n7. Database Migrations\nUse tools like Flyway or Liquibase to handle schema updates during deployment.\n\n8. Monitoring & Logging\nEnable Spring Actuator for health checks and metrics.\n\nCentralize logs using ELK stack, CloudWatch, or other monitoring tools.\n\nConclusion\nDeploying a Spring API can be as simple as running a JAR on a server or as advanced as orchestrating containers in Kubernetes. Choose the method that fits your project’s scale and infrastructure. With proper packaging, configuration, and monitoring, your Spring API will be production-ready.",
-      "excerpt": "Step-by-step walkthrough of deploying a Spring Boot API to a production server, including build configs, Docker, and CI/CD basics.",
+      "id": "5",
+      "title": "FLUTTER-STATE-MGMT.TXT",
+      "date": "09/02/2025",
+      "time": "09:45 AM",
+      "read": "5MIN",
+      "excerpt": "Quick comparison of Provider, Riverpod, Bloc, and setState.",
+      "content": "Choosing state management in Flutter depends on your app’s complexity. setState works for small widgets, Provider is a mid-tier solution, Bloc is more structured, and Riverpod is gaining popularity...",
       "tags": [
-        "SPRING",
-        "API"
+        "FLUTTER",
+        "STATE"
       ],
-      "likes": 17,
-      "comments": 6
+      "likes": 16,
+      "comments": 1,
+      "featured": true
+    },
+    {
+      "id": "6",
+      "title": "BUG-HUNTING-STRATEGIES.TXT",
+      "date": "09/03/2025",
+      "time": "04:20 PM",
+      "read": "3MIN",
+      "excerpt": "How to track down those elusive bugs in complex systems.",
+      "content": "Reproducing bugs reliably is key. Use binary search within commits to isolate regressions. Log everything. When in doubt, simplify the problem...",
+      "tags": [
+        "DEBUGGING"
+      ],
+      "likes": 5,
+      "comments": 0,
+      "featured": false
+    },
+    {
+      "id": "8",
+      "title": "A-VERY-LONG-TITLE-THAT-GOES-ON-AND-ON-TO-TEST-LAYOUT-BREAKING.TXT",
+      "date": "09/05/2025",
+      "time": "03:30 PM",
+      "read": "4MIN",
+      "excerpt": "A test for really long titles and UI wrapping.",
+      "content": "This is just to test how the UI handles super long titles that may overflow or break containers depending on your CSS...",
+      "tags": [
+        "UI"
+      ],
+      "likes": 7,
+      "comments": 2,
+      "featured": true
+    },
+    {
+      "id": "9",
+      "title": "🔥🔥-UNICODE-TEST.TXT",
+      "date": "09/06/2025",
+      "time": "12:15 PM",
+      "read": "2MIN",
+      "excerpt": "Can your app handle Unicode and emoji?",
+      "content": "Here’s a post full of emojis: 🚀🔥💡✨🐍👨‍💻 and other multilingual text like こんにちは, مرحبًا, שלום",
+      "tags": [
+        "TEST"
+      ],
+      "likes": 3,
+      "comments": 0,
+      "featured": false
+    },
+    {
+      "id": "10",
+      "title": "FUTURE-OF-AI.TXT",
+      "date": "09/07/2025",
+      "time": "01:00 PM",
+      "read": "9MIN",
+      "excerpt": "Exploring AI ethics, LLMs, and the road to AGI.",
+      "content": "As AI grows more powerful, ethical frameworks must evolve. LLMs like ChatGPT are stepping stones. However, we must ensure transparency, fairness, and avoid misuse...",
+      "tags": [
+        "AI",
+        "ETHICS"
+      ],
+      "likes": 45,
+      "comments": 13,
+      "featured": false
+    },
+    {
+      "id": "11",
+      "title": "TAGS-MISSING.TXT",
+      "date": "09/08/2025",
+      "time": "05:00 PM",
+      "read": "1MIN",
+      "excerpt": "Just to test empty tags.",
+      "content": "This post has no tags.",
+      "tags": [],
+      "likes": 1,
+      "comments": 0,
+      "featured": true
+    },
+    {
+      "id": "12",
+      "title": "MINIMAL.TXT",
+      "date": "09/09/2025",
+      "time": "08:00 AM",
+      "read": "1MIN",
+      "excerpt": "",
+      "content": "Minimal content to check lowest limits.",
+      "tags": [],
+      "likes": 0,
+      "comments": 0,
+      "featured": false
+    },
+    {
+      "id": "13",
+      "title": "MASSIVE-CONTENT.TXT",
+      "date": "09/10/2025",
+      "time": "02:22 PM",
+      "read": "12MIN",
+      "excerpt": "Large block of content for scroll testing.",
+      "content": "Lorem ipsum ",
+      "tags": [
+        "STRESS",
+        "LARGE"
+      ],
+      "likes": 100,
+      "comments": 25,
+      "featured": true
+    },
+    {
+      "id": "1757444510661",
+      "title": "🔥🔥-UNICODE-TEST.TXT",
+      "date": "9/9/2025",
+      "time": "02:01 PM",
+      "read": "1MIN",
+      "excerpt": "Can your app handle Unicode and emoji?",
+      "tags": [
+        "TEST",
+        "TEST"
+      ],
+      "content": "Here’s a post full of emojis: 🚀🔥💡✨🐍👨‍💻 and other multilingual text like こんにちは, مرحبًا, שלום",
+      "likes": 0,
+      "comments": 0,
+      "featured": true
     },
     {
       "id": "2",
@@ -27,7 +147,21 @@
         "REACT"
       ],
       "likes": 11,
-      "comments": 2
+      "comments": 2,
+      "featured": true
+    },
+    {
+      "id": "1757438374188",
+      "title": "Untitled",
+      "date": "9/9/2025",
+      "time": "12:19 PM",
+      "read": "1MIN",
+      "excerpt": "",
+      "content": "",
+      "tags": [],
+      "likes": 0,
+      "comments": 0,
+      "featured": true
     },
     {
       "id": "3",
@@ -42,56 +176,43 @@
         "UI"
       ],
       "likes": 23,
-      "comments": 4
+      "comments": 4,
+      "featured": true
     },
     {
-      "id": "1757438374188",
+      "id": "1757450260382",
+      "title": "Testing",
+      "date": "9/9/2025",
+      "time": "03:37 PM",
+      "read": "1MIN",
+      "excerpt": "About Testing",
+      "content": "Testing is good. ",
+      "tags": [
+        "TEST",
+        "TEST",
+        "TEST"
+      ],
+      "likes": 0,
+      "comments": 0,
+      "featured": true
+    }
+  ],
+  "draft": [
+    {
+      "id": "1757453185511",
       "title": "Untitled",
       "date": "9/9/2025",
-      "time": "12:19 PM",
+      "time": "04:26 PM",
       "read": "1MIN",
       "excerpt": "",
       "content": "",
       "tags": [],
       "likes": 0,
-      "comments": 0
-    },
-    {
-      "id": "4",
-      "title": "ASYNC-JS-DEEPDIVE.TXT",
-      "date": "09/01/2025",
-      "time": "02:10 PM",
-      "read": "8MIN",
-      "excerpt": "A full breakdown of async patterns in JS: callbacks, promises, and async/await.",
-      "content": "Asynchronous programming in JavaScript enables non-blocking operations. It starts with callbacks, then evolves to promises, and finally async/await for cleaner syntax. Each phase has pros and cons...",
-      "tags": ["JAVASCRIPT"],
-      "likes": 28,
-      "comments": 5
-    },
-    {
-      "id": "5",
-      "title": "FLUTTER-STATE-MGMT.TXT",
-      "date": "09/02/2025",
-      "time": "09:45 AM",
-      "read": "5MIN",
-      "excerpt": "Quick comparison of Provider, Riverpod, Bloc, and setState.",
-      "content": "Choosing state management in Flutter depends on your app’s complexity. setState works for small widgets, Provider is a mid-tier solution, Bloc is more structured, and Riverpod is gaining popularity...",
-      "tags": ["FLUTTER", "STATE"],
-      "likes": 16,
-      "comments": 1
-    },
-    {
-      "id": "6",
-      "title": "BUG-HUNTING-STRATEGIES.TXT",
-      "date": "09/03/2025",
-      "time": "04:20 PM",
-      "read": "3MIN",
-      "excerpt": "How to track down those elusive bugs in complex systems.",
-      "content": "Reproducing bugs reliably is key. Use binary search within commits to isolate regressions. Log everything. When in doubt, simplify the problem...",
-      "tags": ["DEBUGGING"],
-      "likes": 5,
-      "comments": 0
-    },
+      "comments": 0,
+      "featured": false
+    }
+  ],
+  "trash": [
     {
       "id": "7",
       "title": "EMPTY-POST-FIELDS.TXT",
@@ -102,80 +223,23 @@
       "content": "",
       "tags": [],
       "likes": 0,
-      "comments": 0
+      "comments": 0,
+      "featured": true
     },
     {
-      "id": "8",
-      "title": "A-VERY-LONG-TITLE-THAT-GOES-ON-AND-ON-TO-TEST-LAYOUT-BREAKING.TXT",
-      "date": "09/05/2025",
-      "time": "03:30 PM",
-      "read": "4MIN",
-      "excerpt": "A test for really long titles and UI wrapping.",
-      "content": "This is just to test how the UI handles super long titles that may overflow or break containers depending on your CSS...",
-      "tags": ["UI"],
-      "likes": 7,
-      "comments": 2
-    },
-    {
-      "id": "9",
-      "title": "🔥🔥-UNICODE-TEST.TXT",
-      "date": "09/06/2025",
-      "time": "12:15 PM",
-      "read": "2MIN",
-      "excerpt": "Can your app handle Unicode and emoji?",
-      "content": "Here’s a post full of emojis: 🚀🔥💡✨🐍👨‍💻 and other multilingual text like こんにちは, مرحبًا, שלום",
-      "tags": ["TEST"],
-      "likes": 3,
-      "comments": 0
-    },
-    {
-      "id": "10",
-      "title": "FUTURE-OF-AI.TXT",
-      "date": "09/07/2025",
-      "time": "01:00 PM",
-      "read": "9MIN",
-      "excerpt": "Exploring AI ethics, LLMs, and the road to AGI.",
-      "content": "As AI grows more powerful, ethical frameworks must evolve. LLMs like ChatGPT are stepping stones. However, we must ensure transparency, fairness, and avoid misuse...",
-      "tags": ["AI", "ETHICS"],
-      "likes": 45,
-      "comments": 13
-    },
-    {
-      "id": "11",
-      "title": "TAGS-MISSING.TXT",
-      "date": "09/08/2025",
-      "time": "05:00 PM",
-      "read": "1MIN",
-      "excerpt": "Just to test empty tags.",
-      "content": "This post has no tags.",
-      "tags": [],
-      "likes": 1,
-      "comments": 0
-    },
-    {
-      "id": "12",
-      "title": "MINIMAL.TXT",
-      "date": "09/09/2025",
-      "time": "08:00 AM",
-      "read": "1MIN",
-      "excerpt": "",
-      "content": "Minimal content to check lowest limits.",
-      "tags": [],
-      "likes": 0,
-      "comments": 0
-    },
-    {
-      "id": "13",
-      "title": "MASSIVE-CONTENT.TXT",
-      "date": "09/10/2025",
-      "time": "02:22 PM",
-      "read": "12MIN",
-      "excerpt": "Large block of content for scroll testing.",
-      "content": "Lorem ipsum ",
-      "tags": ["STRESS", "LARGE"],
-      "likes": 100,
-      "comments": 25
+      "id": "4",
+      "title": "ASYNC-JS-DEEPDIVE.TXT",
+      "date": "09/01/2025",
+      "time": "02:10 PM",
+      "read": "8MIN",
+      "excerpt": "A full breakdown of async patterns in JS: callbacks, promises, and async/await.",
+      "content": "Asynchronous programming in JavaScript enables non-blocking operations. It starts with callbacks, then evolves to promises, and finally async/await for cleaner syntax. Each phase has pros and cons...",
+      "tags": [
+        "JAVASCRIPT"
+      ],
+      "likes": 28,
+      "comments": 5,
+      "featured": false
     }
   ]
 }
-
