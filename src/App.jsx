@@ -348,7 +348,7 @@ export default function App() {
       }
     } else {
       const newPost = {
-        id: String(meta.now.getTime()),
+        id,
         title: formData.title || 'Untitled',
         date: meta.date,
         time: meta.time,
@@ -370,7 +370,9 @@ export default function App() {
         setIsEditorOpen(false);
         setSelectedPost(null);
         setExisted(false);
-        setDraftedPost(prev => prev.filter(p => p.id !== id));
+        postServices.deletePost('draft',newPost.id).then(() => {
+             setDraftedPost(prev => prev.filter(p => p.id !== id));
+        })
       }
     }
   };
