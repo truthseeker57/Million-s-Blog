@@ -315,67 +315,65 @@ export default function App() {
   };
 
   const handleContentUpdate = async (e) => {
-    e.preventDefault();
-    if (!selectedPost) return;
+  e.preventDefault();
+  if (!selectedPost) return;
 
-    const id = selectedPost.id;
-    const original = posts.find(p => p.id === id) || {};
-    const meta = getMeta(formData);
+  const id = selectedPost.id;
+  const original = posts.find(p => p.id === id) || {};
+  const meta = getMeta(formData);
 
+  const buildPostData = (isNew) => ({
+    ...(!isNew && original),
+    id,
+    title: formData.title || 'Untitled',
+    date: isNew ? meta.date : undefined,
+    time: isNew ? meta.time : undefined,
+    read: isNew ? meta.read : undefined,
+    excerpt: formData.excerpt || formData.content.slice(0, 250),
+    tags: tagAssembler(formData.tags),
+    content: formData.content,
+    likes: isNew ? 0 : original.likes,
+    comments: isNew ? 0 : original.comments,
+    featured: isNew ? false : original.featured,
+  });
+
+  const cleanup = () => {
+    setIsEditorOpen(false);
+    setSelectedPost(null);
+  };
+
+  try {
     if (!existed) {
-      const updatedPost = {
-        ...original,
-        title: formData.title,
-        excerpt: formData.excerpt || formData.content.slice(0, 250),
-        tags: tagAssembler(formData.tags),
-        content: formData.content
-      };
+      const updatedPost = buildPostData(false);
+      const data = await postServices.editPost('posts', id, updatedPost);
 
-      try {
-        const data = await postServices.editPost('posts', id, updatedPost);
-        if (data) {
-          setPosts(prev =>
-            prev.map(p =>
-              p.id === id ? { ...data, tags: ensureTagArray(data.tags) } : p
-            )
-          );
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsEditorOpen(false);
-        setSelectedPost(null);
+      if (data) {
+        setPosts(prev =>
+          prev.map(p =>
+            p.id === id ? { ...data, tags: ensureTagArray(data.tags) } : p
+          )
+        );
       }
     } else {
-      const newPost = {
-        id,
-        title: formData.title || 'Untitled',
-        date: meta.date,
-        time: meta.time,
-        read: meta.read,
-        excerpt: formData.excerpt || formData.content.slice(0, 250),
-        tags: tagAssembler(formData.tags),
-        content: formData.content,
-        likes: 0,
-        comments: 0,
-        featured: false,
-      };
+      const newPost = buildPostData(true);
+      const created = await postServices.createPost('posts', newPost);
 
-      try {
-        const created = await postServices.createPost('posts', newPost);
-        setPosts(prev => [...prev, { ...created, tags: ensureTagArray(created.tags) }]);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setIsEditorOpen(false);
-        setSelectedPost(null);
-        setExisted(false);
-        postServices.deletePost('draft',newPost.id).then(() => {
-             setDraftedPost(prev => prev.filter(p => p.id !== id));
-        })
-      }
+      setPosts(prev => [
+        ...prev,
+        { ...created, tags: ensureTagArray(created.tags) },
+      ]);
+
+      await postServices.deletePost('draft', newPost.id);
+      setDraftedPost(prev => prev.filter(p => p.id !== id));
+      setExisted(false);
     }
-  };
+  } catch (err) {
+    console.error(err);
+  } finally {
+    cleanup();
+  }
+};
+
 
   const handleModalSubmit = async (e) => {
     e.preventDefault();
